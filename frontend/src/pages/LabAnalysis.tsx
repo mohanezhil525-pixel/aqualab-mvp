@@ -62,7 +62,7 @@ export const LabAnalysis = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {parameters.map((param) => {
+              {parameters.map((param, index) => {
                 const val = parseFloat(results[param.id] || '0');
                 const hasValue = results[param.id] !== undefined && results[param.id] !== '';
                 const isCompliant = hasValue && val >= param.min && val <= param.max;
@@ -73,6 +73,7 @@ export const LabAnalysis = () => {
                     <TableCell className="text-slate-300">{param.min} - {param.max}</TableCell>
                     <TableCell>
                       <Input 
+                        id={`param-input-${index}`}
                         type="number" 
                         step="0.01"
                         className={`w-32 bg-slate-900/80 border-purple-500/40 text-white focus:border-purple-400 focus:ring-1 focus:ring-purple-400 ${
@@ -84,6 +85,15 @@ export const LabAnalysis = () => {
                         }`} 
                         value={results[param.id] || ''}
                         onChange={(e) => handleResultChange(param.id, e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            const nextInput = document.getElementById(`param-input-${index + 1}`);
+                            if (nextInput) {
+                              nextInput.focus();
+                            }
+                          }
+                        }}
                       />
                     </TableCell>
                     <TableCell>
