@@ -1,5 +1,7 @@
 # AquaLab: Next-Gen Water Quality Intelligence System
 
+🌍 **[View Live Project Here](https://aqualab-mvp-nu.vercel.app)** 🌍
+
 A high-performance Laboratory Information Management System (LIMS) designed for speed, instant compliance checking, automated PDF reporting, and real-time geospatial monitoring of water quality.
 
 ---
