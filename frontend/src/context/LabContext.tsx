@@ -14,6 +14,8 @@ interface LabContextType {
   parameters: any[];
   sampleResults: Record<string, Record<string, string>>;
   updateSampleResults: (sampleId: string, results: Record<string, string>) => void;
+  userRole: 'staff' | 'client';
+  login: (role: 'staff' | 'client') => void;
 }
 
 const LabContext = createContext<LabContextType | undefined>(undefined);
@@ -63,13 +65,27 @@ export const LabProvider = ({ children }: { children: ReactNode }) => {
     { id: 3, text: 'John M. generated monthly compliance audit report', time: '1h ago', iconType: 'check', color: 'text-emerald-500', timestamp: '2026-08-24 14:30:00', user: 'John Manager', action: 'REPORT_GENERATED', entity: 'System' },
   ]);
   
-  const currentUser = {
-    name: 'Jane Technician',
-    role: 'Senior Quality Analyst',
-    id: 'LAB-8842',
-    unit: 'Chennai Central Water Lab',
-    shift: 'Morning Shift'
+  const [userRole, setUserRole] = useState<'staff' | 'client'>('staff');
+
+  const login = (role: 'staff' | 'client') => {
+    setUserRole(role);
   };
+
+  const currentUser = userRole === 'staff'
+    ? {
+        name: 'Jane Technician',
+        role: 'Senior Quality Analyst',
+        id: 'LAB-8842',
+        unit: 'Chennai Central Water Lab',
+        shift: 'Morning Shift'
+      }
+    : {
+        name: 'Acme Corp Admin',
+        role: 'Client Administrator',
+        id: 'CLIENT-9910',
+        unit: 'Acme Corp Headquarters',
+        shift: 'Standard Access'
+      };
 
   const stations = [
     { id: '1', name: 'Chennai (Ennore Coastal Intake)', coords: [13.2000, 80.3200], status: 'Safe', breach: false },
@@ -154,7 +170,7 @@ export const LabProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <LabContext.Provider value={{ samples, addSample, updateSampleStatus, auditLogs, addAuditLog, stations, currentUser, trendData, distributionData, parameters, sampleResults, updateSampleResults }}>
+    <LabContext.Provider value={{ samples, addSample, updateSampleStatus, auditLogs, addAuditLog, stations, currentUser, trendData, distributionData, parameters, sampleResults, updateSampleResults, userRole, login }}>
       {children}
     </LabContext.Provider>
   );

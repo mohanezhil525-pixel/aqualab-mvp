@@ -18,15 +18,19 @@ const createStatusIcon = (status: string) => {
 };
 
 export const SourceMap = () => {
-  const { stations } = useLabContext();
+  const { stations, userRole } = useLabContext();
+  
+  const displayStations = userRole === 'staff'
+    ? stations
+    : stations.filter(s => s.name.includes('Delhi') || s.name.includes('Pune'));
   const navigate = useNavigate();
 
   return (
     <div className="flex flex-col h-[calc(100vh-6rem)] relative">
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-white">India Monitoring Network</h1>
-          <p className="text-purple-200/70 mt-1 text-sm">Real-time geospatial water quality stations</p>
+          <h1 className="text-3xl font-bold tracking-tight text-white">{userRole === 'staff' ? 'India Monitoring Network' : 'My Monitored Intakes'}</h1>
+          <p className="text-purple-200/70 mt-1 text-sm">{userRole === 'staff' ? 'Real-time geospatial water quality stations' : 'Isolated view of Acme Corp facilities'}</p>
         </div>
         <div className="flex gap-4">
           <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-emerald-500 shadow-[0_0_10px_#10b981]"></div><span className="text-sm text-purple-100">Safe</span></div>
@@ -42,7 +46,7 @@ export const SourceMap = () => {
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           />
           
-          {stations.map(station => (
+          {displayStations.map(station => (
             <Marker key={station.id} position={station.coords as [number, number]} icon={createStatusIcon(station.status)}>
               <Popup className="rounded-xl min-w-[200px]">
                 <div className="p-1 bg-white text-slate-900 rounded-lg -m-3 shadow-lg">
@@ -58,14 +62,16 @@ export const SourceMap = () => {
                     </p>
                     {station.detail && <p className="text-xs font-semibold text-rose-600 mt-1">Alert: {station.detail}</p>}
                   </div>
-                  <div className="p-3 pt-0">
-                    <button 
-                      onClick={() => navigate('/lab')}
-                      className="w-full bg-purple-100 hover:bg-purple-200 text-purple-900 border border-purple-200 text-xs font-bold py-1.5 rounded transition-colors flex items-center justify-center gap-1"
-                    >
-                      Log Test for Station <ArrowRight className="w-3 h-3" />
-                    </button>
-                  </div>
+                  {userRole === 'staff' && (
+                    <div className="p-3 pt-0">
+                      <button 
+                        onClick={() => navigate('/lab')}
+                        className="w-full bg-purple-100 hover:bg-purple-200 text-purple-900 border border-purple-200 text-xs font-bold py-1.5 rounded transition-colors flex items-center justify-center gap-1"
+                      >
+                        Log Test for Station <ArrowRight className="w-3 h-3" />
+                      </button>
+                    </div>
+                  )}
                 </div>
               </Popup>
             </Marker>

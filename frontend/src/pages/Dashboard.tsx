@@ -22,7 +22,10 @@ const createStatusIcon = (isBreach: boolean) => L.divIcon({
 
 export const Dashboard = () => {
   const navigate = useNavigate();
-  const { auditLogs, stations, trendData, distributionData, addSample, addAuditLog, samples, sampleResults, parameters } = useLabContext();
+  const { auditLogs, stations, trendData, distributionData, addSample, addAuditLog, samples: allSamples, sampleResults, parameters, userRole } = useLabContext();
+  
+  const clientName = 'Acme Corp';
+  const samples = userRole === 'staff' ? allSamples : allSamples.filter(s => s.client === clientName);
   
   const activeSamplesCount = samples.filter(s => s.status !== 'COMPLETED').length;
   const completedSamplesCount = samples.filter(s => s.status === 'COMPLETED').length;
@@ -156,8 +159,8 @@ export const Dashboard = () => {
       <GlassCard className="flex flex-col gap-6 p-6">
         {/* Title */}
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-white mb-2">Dashboard</h1>
-          <p className="text-purple-200/70 text-sm">System Overview and Key Metrics</p>
+          <h1 className="text-3xl font-bold tracking-tight text-white mb-2">{userRole === 'staff' ? 'Dashboard' : 'My Dashboard'}</h1>
+          <p className="text-purple-200/70 text-sm">{userRole === 'staff' ? 'System Overview and Key Metrics' : `${clientName} - Dedicated Client Portal`}</p>
         </div>
 
         {/* Filters and Actions */}
@@ -183,12 +186,16 @@ export const Dashboard = () => {
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
-            <Button onClick={() => setIsRegisterOpen(true)} className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white shadow-[0_0_20px_rgba(147,51,234,0.5)] border border-purple-500/50">
-              <Plus className="mr-2 h-4 w-4" /> Register Sample
-            </Button>
-            <Button onClick={() => setIsLogResultsOpen(true)} variant="outline" className="border-white/20 bg-white/5 text-white hover:bg-white/10 hover:border-purple-400 shadow-sm backdrop-blur-md">
-              <Beaker className="mr-2 h-4 w-4" /> Log Results
-            </Button>
+            {userRole === 'staff' && (
+              <>
+                <Button onClick={() => setIsRegisterOpen(true)} className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white shadow-[0_0_20px_rgba(147,51,234,0.5)] border border-purple-500/50">
+                  <Plus className="mr-2 h-4 w-4" /> Register Sample
+                </Button>
+                <Button onClick={() => setIsLogResultsOpen(true)} variant="outline" className="border-white/20 bg-white/5 text-white hover:bg-white/10 hover:border-purple-400 shadow-sm backdrop-blur-md">
+                  <Beaker className="mr-2 h-4 w-4" /> Log Results
+                </Button>
+              </>
+            )}
             <Button onClick={handleExportPDF} variant="outline" className="border-white/20 bg-white/5 text-white hover:bg-white/10 hover:border-purple-400 shadow-sm backdrop-blur-md">
               <Download className="mr-2 h-4 w-4" /> Export
             </Button>
@@ -225,7 +232,7 @@ export const Dashboard = () => {
 
         <GlassCard>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-purple-200/70">Active Load</CardTitle>
+            <CardTitle className="text-sm font-medium text-purple-200/70">{userRole === 'staff' ? 'Active Load' : 'My Active Samples'}</CardTitle>
             <Beaker className="h-4 w-4 text-purple-400 drop-shadow-[0_0_8px_rgba(168,85,247,0.5)]" />
           </CardHeader>
           <CardContent>
@@ -300,7 +307,7 @@ export const Dashboard = () => {
       </div>
 
       {/* Bottom Section */}
-      <div className="grid gap-6 lg:grid-cols-2 select-none cursor-default">
+      <div className={`grid gap-6 select-none cursor-default ${userRole === 'staff' ? 'lg:grid-cols-2' : 'lg:grid-cols-1'}`}>
         <GlassCard className="h-[400px]">
           <CardHeader className="flex flex-row items-center justify-between pb-2 relative z-10 shrink-0 bg-black/40 backdrop-blur-md rounded-t-2xl border-b border-white/5">
             <div>
@@ -323,27 +330,29 @@ export const Dashboard = () => {
           </div>
         </GlassCard>
 
-        <GlassCard className="flex flex-col h-[400px]">
-          <CardHeader className="shrink-0 pb-4">
-            <CardTitle className="text-lg text-white">Live Activity Feed</CardTitle>
-            <CardDescription className="text-purple-200/70">Real-time laboratory operations log</CardDescription>
-          </CardHeader>
-          <CardContent className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
-            <div className="relative border-l border-white/10 ml-3 space-y-6 pb-4 pt-2">
-              {auditLogs.map((log: any) => (
-                <div key={log.id} className="relative pl-6">
-                  <span className={`absolute -left-[13px] top-0 h-6 w-6 rounded-full border border-white/20 bg-black flex items-center justify-center ${log.color} shadow-[0_0_10px_currentColor]`}>
-                    <Activity className="h-3 w-3" />
-                  </span>
-                  <div className="flex flex-col">
-                    <span className="text-sm font-medium text-purple-100 leading-tight">{log.text}</span>
-                    <span className="text-xs text-purple-200/50 mt-1">{log.time}</span>
+        {userRole === 'staff' && (
+          <GlassCard className="flex flex-col h-[400px]">
+            <CardHeader className="shrink-0 pb-4">
+              <CardTitle className="text-lg text-white">Live Activity Feed</CardTitle>
+              <CardDescription className="text-purple-200/70">Real-time laboratory operations log</CardDescription>
+            </CardHeader>
+            <CardContent className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
+              <div className="relative border-l border-white/10 ml-3 space-y-6 pb-4 pt-2">
+                {auditLogs.map((log: any) => (
+                  <div key={log.id} className="relative pl-6">
+                    <span className={`absolute -left-[13px] top-0 h-6 w-6 rounded-full border border-white/20 bg-black flex items-center justify-center ${log.color} shadow-[0_0_10px_currentColor]`}>
+                      <Activity className="h-3 w-3" />
+                    </span>
+                    <div className="flex flex-col">
+                      <span className="text-sm font-medium text-purple-100 leading-tight">{log.text}</span>
+                      <span className="text-xs text-purple-200/50 mt-1">{log.time}</span>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </GlassCard>
+                ))}
+              </div>
+            </CardContent>
+          </GlassCard>
+        )}
       </div>
 
       {/* --- MODALS --- */}

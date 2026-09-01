@@ -3,15 +3,18 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Activity, Beaker } from 'lucide-react';
+import { useLabContext } from '../context/LabContext';
 
 export const LoginPage = () => {
   const navigate = useNavigate();
+  const { login } = useLabContext();
   const [isLoading, setIsLoading] = useState(false);
   const [loginType, setLoginType] = useState<'staff' | 'client'>('staff');
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    login(loginType);
     setTimeout(() => {
       setIsLoading(false);
       navigate('/dashboard');

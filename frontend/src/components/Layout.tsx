@@ -12,7 +12,7 @@ interface LayoutProps {
 export const Layout = ({ children }: LayoutProps) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { currentUser } = useLabContext();
+  const { currentUser, userRole } = useLabContext();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   const handleSignOut = () => {
@@ -20,7 +20,7 @@ export const Layout = ({ children }: LayoutProps) => {
     navigate('/login');
   };
 
-  const navigation = [
+  const allNavigation = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
     { name: 'Source Map', href: '/map', icon: Map },
     { name: 'Sample Registration', href: '/samples/new', icon: FileSignature },
@@ -28,6 +28,14 @@ export const Layout = ({ children }: LayoutProps) => {
     { name: 'Reports', href: '/reports', icon: FileText },
     { name: 'Compliance', href: '/compliance', icon: Activity },
   ];
+
+  const navigation = userRole === 'staff'
+    ? allNavigation
+    : [
+        { name: 'My Dashboard', href: '/dashboard', icon: LayoutDashboard },
+        { name: 'My Water Sources', href: '/map', icon: Map },
+        { name: 'My Reports', href: '/reports', icon: FileText },
+      ];
 
   return (
     <div className="flex h-screen font-sans text-slate-100 bg-[#07070D] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-purple-900/30 via-slate-950 to-black">
@@ -111,7 +119,7 @@ export const Layout = ({ children }: LayoutProps) => {
                       </div>
                       
                       <div className="space-y-2 mb-4 mt-4 text-sm bg-white/5 rounded-lg p-3 border border-white/5">
-                        <div className="flex justify-between"><span className="text-purple-200/70">Employee ID</span><span className="font-medium text-white">{currentUser?.id}</span></div>
+                        <div className="flex justify-between"><span className="text-purple-200/70">{userRole === 'staff' ? 'Employee ID' : 'Client ID'}</span><span className="font-medium text-white">{currentUser?.id}</span></div>
                         <div className="flex justify-between"><span className="text-purple-200/70">Unit</span><span className="font-medium text-white text-right w-24 truncate">{currentUser?.unit}</span></div>
                         <div className="flex justify-between"><span className="text-purple-200/70">Shift</span><span className="font-medium text-white">{currentUser?.shift}</span></div>
                       </div>
