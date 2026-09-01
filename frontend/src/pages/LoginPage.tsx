@@ -7,6 +7,7 @@ import { Activity, Beaker } from 'lucide-react';
 export const LoginPage = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const [loginType, setLoginType] = useState<'staff' | 'client'>('staff');
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,12 +31,35 @@ export const LoginPage = () => {
         </div>
 
         <form onSubmit={handleLogin} className="space-y-6">
+          <div className="flex bg-black/40 border border-white/10 rounded-lg p-1 mb-6">
+            <button
+              type="button"
+              onClick={() => setLoginType('staff')}
+              className={`flex-1 text-sm font-medium py-2 rounded-md transition-all ${
+                loginType === 'staff' ? 'bg-purple-600 text-white shadow-[0_0_15px_rgba(168,85,247,0.4)]' : 'text-purple-200/50 hover:text-purple-200'
+              }`}
+            >
+              Office Staff
+            </button>
+            <button
+              type="button"
+              onClick={() => setLoginType('client')}
+              className={`flex-1 text-sm font-medium py-2 rounded-md transition-all ${
+                loginType === 'client' ? 'bg-purple-600 text-white shadow-[0_0_15px_rgba(168,85,247,0.4)]' : 'text-purple-200/50 hover:text-purple-200'
+              }`}
+            >
+              Client Portal
+            </button>
+          </div>
+
           <div className="space-y-2">
-            <label htmlFor="email" className="block text-sm font-medium text-purple-200/70">Employee ID / Email</label>
+            <label htmlFor="identifier" className="block text-sm font-medium text-purple-200/70">
+              {loginType === 'staff' ? 'Employee ID' : 'Client Email'}
+            </label>
             <Input 
-              id="email" 
-              type="email" 
-              placeholder="e.g. EMP-2024" 
+              id="identifier" 
+              type={loginType === 'client' ? 'email' : 'text'} 
+              placeholder={loginType === 'staff' ? 'e.g. EMP-2024' : 'e.g. admin@citywater.gov'} 
               required
               className="bg-black/40 border-white/10 text-white placeholder:text-purple-200/30 focus-visible:ring-purple-500 focus-visible:border-purple-500"
             />
